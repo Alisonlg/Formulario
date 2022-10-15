@@ -1,0 +1,996 @@
+<html>
+
+<head>
+    <title> InfoMaker - Reembolso </title>
+    <script language="JavaScript">
+
+        window.onclick = e => {
+            var navitems = document.getElementsByClassName('navitem');
+            var hiddenitems = document.getElementsByClassName('container-box grouphide');
+            var navbarleft = navitems[0];
+            var navbarright = navitems[1];
+            var button = document.getElementsByClassName('validacampo');
+            var buttontype = button[0];
+
+            if (e.target.id === "navitem") {
+                if (!e.target.classList.contains("active")) {
+                    if (e.target.classList.contains("right")) {
+                        e.target.classList.add("active")
+                        navbarleft.classList.remove("active")
+                        for (let i = 0; i < hiddenitems.length; i++) {
+                            hiddenitems[i].style.display = "none";
+                        }
+                        if (buttontype.classList.contains("full")) {
+                            buttontype.classList.remove("full")
+                        }
+                    }
+                    if (e.target.classList.contains("left")) {
+                        e.target.classList.add("active")
+                        navbarright.classList.remove("active")
+                        for (let i = 0; i < hiddenitems.length; i++) {
+                            hiddenitems[i].style.display = "flex";
+                        }
+                        if (!buttontype.classList.contains("full")) {
+                            buttontype.classList.add("full")
+                        }
+                    }
+                }
+            }
+        }
+
+        function selecttipopessoa(valor) {
+
+            var txt = new String();
+
+            if (valor == '') txt = '';
+
+            cpfcnpj.innerHTML = '';
+            curinput1 = valor;
+            switch (valor) {
+                case 'PESSOA_FISICA':
+
+                    txt += '<label for="cpfcnpj">Confirme o CPF do titular da conta</label><input class="cpfcnpj" name="cpf" type="text" placeholder="xxx.xxx.xxx-xx" id="cpf" size="12" maxlength="14" onBlur="validaCPF(this);" required>';
+                    break;
+
+
+
+                case 'PESSOA_JURIDICA':
+                    txt += '<label for="cpfcnpj">Confirme o CNPJ do titular da conta</label><input class="cpfcnpj" name="cpf" type="text" placeholder="xx.xxx.xxx/xxxx-xx" id="cpf" size="15" maxlength="18" onBlur="validaCNPJ(this);" required>';
+                    break;
+
+            }
+            cpfcnpj.innerHTML = txt;
+        }
+
+        function validaCPF(cpf) {
+            erro = new String;
+
+            if (cpf.value.length == 11 || cpf.value.length == 14) {
+                cpf.value = cpf.value.replace('.', '');
+                cpf.value = cpf.value.replace('.', '');
+                cpf.value = cpf.value.replace('-', '');
+
+                var nonNumbers = /\D/;
+
+                if (nonNumbers.test(cpf.value)) {
+                    erro = "A verificação de CPF suporta apenas números!";
+                    cpf.focus();
+
+                } else {
+                    if (cpf.value == "00000000000" ||
+                        cpf.value == "11111111111" ||
+                        cpf.value == "22222222222" ||
+                        cpf.value == "33333333333" ||
+                        cpf.value == "44444444444" ||
+                        cpf.value == "55555555555" ||
+                        cpf.value == "66666666666" ||
+                        cpf.value == "77777777777" ||
+                        cpf.value == "88888888888" ||
+                        cpf.value == "99999999999") {
+
+
+                        erro = "Número de CPF inválido!"
+                        cpf.focus();
+                    }
+
+                    var a = [];
+                    var b = new Number;
+                    var c = 11;
+
+                    for (i = 0; i < 11; i++) {
+                        a[i] = cpf.value.charAt(i);
+                        if (i < 9) b += (a[i] * --c);
+                    }
+
+                    if ((x = b % 11) < 2) { a[9] = 0 } else { a[9] = 11 - x }
+                    b = 0;
+                    c = 11;
+
+                    for (y = 0; y < 10; y++) b += (a[y] * c--);
+
+                    if ((x = b % 11) < 2) { a[10] = 0; } else { a[10] = 11 - x; }
+
+                    if ((cpf.value.charAt(9) != a[9]) || (cpf.value.charAt(10) != a[10])) {
+                        erro = "Número de CPF inválido.";
+                        cpf.focus();
+
+                    }
+                }
+
+            } else {
+                if (cpf.value.length == 0)
+                    return false;
+                else
+                    erro = "Número de CPF inválido.";
+                cpf.focus();
+            }
+            if (erro.length > 0) {
+                alert(erro);
+
+                cpf.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validaCNPJ(c) {
+
+            c.value = c.value.replace('.', '');
+            c.value = c.value.replace('.', '');
+            c.value = c.value.replace('-', '');
+            c.value = c.value.replace('/', '');
+
+            var numeros, digitos, soma, i, resultado, pos, tamanho, digitos_iguais, cnpj = c.value.replace(/\D+/g, '');
+            digitos_iguais = 1;
+            if (cnpj.length != 14 && cnpj.length != 18) {
+                alert('CNPJ inválido');
+                c.focus();
+                return false;
+            }
+
+            for (i = 0; i < cnpj.length - 1; i++)
+                if (cnpj.charAt(i) != cnpj.charAt(i + 1)) {
+                    digitos_iguais = 0;
+                    break;
+                }
+            if (!digitos_iguais) {
+                tamanho = cnpj.length - 2
+                numeros = cnpj.substring(0, tamanho);
+                digitos = cnpj.substring(tamanho);
+                soma = 0;
+                pos = tamanho - 7;
+                for (i = tamanho; i >= 1; i--) {
+                    soma += numeros.charAt(tamanho - i) * pos--;
+                    if (pos < 2)
+                        pos = 9;
+                }
+                resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+                if (resultado != digitos.charAt(0)) {
+                    alert('CNPJ inválido');
+                    c.focus();
+                    return false;
+                }
+
+                tamanho = tamanho + 1;
+                numeros = cnpj.substring(0, tamanho);
+                soma = 0;
+                pos = tamanho - 7;
+                for (i = tamanho; i >= 1; i--) {
+                    soma += numeros.charAt(tamanho - i) * pos--;
+                    if (pos < 2)
+                        pos = 9;
+                }
+                resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+                if (resultado != digitos.charAt(1)) {
+                    alert('CNPJ inválido');
+                    c.focus();
+                    return false;
+                }
+                else {
+                    // alert('CNPJ  OK !');
+                    return true;
+                }
+            }
+            else {
+                alert('CNPJ inválido');
+                c.focus();
+                return false;
+            }
+        }
+
+        function validaCelular(input) {
+
+            var numero = input.value;
+            erro = new String;
+            numero = numero.replace('(', '');
+            numero = numero.replace(')', '');
+            numero = numero.replace('-', '');
+            numero = numero.replace(' ', '');
+
+            var nonNumbers = /\D/;
+
+            if (nonNumbers.test(numero)) {
+                erro = "A verificação de celular suporta apenas números!";
+                input.focus();
+            } else {
+                let format1 = numero.substring(0, 2);
+                let format2 = numero.substr(2);
+                numero = format1 + "-" + format2;
+                input.value = numero;
+            }
+            if (erro.length > 0) {
+                alert(erro);
+
+                input.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validaNumero(input, x) {
+            var numero = input.value;
+            if (numero.length > x) {
+                input.value = "";
+                alert("Limite de número excedidos");
+            }
+        }
+
+        function teste(element) {
+            var elementsdobro = document.getElementsByClassName('dobro');
+            var elementdobro = elementsdobro[0];
+            if (element != 0) {
+                if (element == "CLIENTE PAGOU EM DUPLICIDADE") {
+                    elementdobro.disabled = true;
+                    elementdobro.value = "REEMBOLSO EM DOBRO_NÃO";
+                } else {
+                    elementdobro.disabled = false;
+                }
+            }
+        }
+
+        function preencheZeros(input, x) {
+            var element = document.getElementById(input);
+            var size = element.value.length;
+            while (size < x) {
+                element.value = "0" + element.value
+                size = size + 1
+            }
+        }
+
+        function TextBoxCaixaAlta_OnBlur(fsValor, foForm, foNome) {
+            var tam = 0;
+            x = new String(document.forms[foForm].elements[foNome].value);
+            while (tam != x.length) {
+                tam = x.length;
+                x = x.replace('\'', '');
+            }
+            document.forms[foForm].elements[foNome].value = x.toUpperCase();
+        }
+
+        function valida_campo() {
+
+            var button = document.getElementsByClassName('validacampo');
+            var buttontype = button[0]
+
+            var tipopessoas = document.getElementsByClassName('tipopessoa');
+            var tipopessoa = tipopessoas[0];
+            if (tipopessoa.value == "") {
+                alert("Necessário informar o tipo de contrato do beneficiário");
+                tipopessoa.focus()
+                return false
+            }
+
+            if (buttontype.classList.contains("full")) {
+                var tipocontas = document.getElementsByClassName('tipoconta');
+                var tipoconta = tipocontas[0];
+                if (tipoconta.value == "") {
+                    alert("Necessário informar o beneficiário do reembolso");
+                    tipocontas.focus()
+                    return false
+                }
+            }
+
+            var nomeclientes = document.getElementsByClassName('nomecliente');
+            var nomecliente = nomeclientes[0];
+            if (nomecliente.value == "") {
+                alert("Necessário informar o nome completo do titular");
+                nomecliente.focus()
+                return false
+            }
+
+            var cpfcnpjs = document.getElementsByClassName('cpfcnpj');
+            var cpfcnpj = cpfcnpjs[0];
+            if (cpfcnpj.value == "") {
+                alert("Necessário informar o número do CPF ou CNPJ");
+                cpfcnpj.focus()
+                return false
+            }
+
+            if (buttontype.classList.contains("full")) {
+                var bancos = document.getElementsByClassName('banco');
+                var banco = bancos[0];
+                if (banco.value == "") {
+                    alert("Necessário informar em qual banco o cliente possui conta");
+                    banco.focus()
+                    return false
+                }
+
+                var agencias = document.getElementsByClassName('agencia');
+                var agencia = agencias[0];
+                if (agencia.value == "") {
+                    alert("Necessário informar o número da agencia da conta corrente");
+                    agencia.focus()
+                    return false
+                }
+
+                var contas = document.getElementsByClassName('conta');
+                var conta = contas[0];
+                if (conta.value == "") {
+                    alert("Necessário informar o número da conta corrente");
+                    conta.focus()
+                    return false
+                }
+
+                var contadigitos = document.getElementsByClassName('conta-digito');
+                var contadigito = contadigitos[0];
+                if (contadigito.value == "") {
+                    alert("Necessário informar o dígito da conta corrente");
+                    contadigito.focus()
+                    return false
+                }
+            }
+
+            var motivos = document.getElementsByClassName('motivo');
+            var motivo = motivos[0];
+            if (motivo.value == "") {
+                alert("Necessário informar o motivo para o reembolso");
+                motivo.focus()
+                return false
+            }
+
+            var dobros = document.getElementsByClassName('dobro');
+            var dobro = dobros[0];
+            if (dobro.value == "") {
+                alert("Necessário informar se o cliente solicitou reembolso em dobro, por erro da NET");
+                dobro.focus()
+                return false
+            }
+
+            var celulars = document.getElementsByClassName('celular');
+            var celular = celulars[0];
+            var celular2 = celulars[1];
+            var celular3 = celulars[2];
+            if (celular.value == "" || celular2.value == "" || celular3.value == "") {
+                alert("Necessário informar telefone atualizado para contato");
+                celular.focus()
+                return false
+            }
+
+            var vencimentos = document.getElementsByClassName('vencimento');
+            var vencimento = vencimentos[0];
+            var vencimento2 = vencimentos[1];
+            var vencimento3 = vencimentos[2];
+            var vencimento4 = vencimentos[3];
+            var vencimento5 = vencimentos[4];
+            var vencimento6 = vencimentos[5];
+            if (vencimento.value == "") {
+                alert("Necessário informar vencimento da conta a ser reembolsada");
+                vencimento.focus()
+                return false
+            }
+
+            var emails = document.getElementsByClassName('email');
+            var email = emails[0];
+            if (email == "") {
+                alert("Necessário informar email atualizado para contato");
+                email.focus()
+                return false
+            }
+
+            var descricaos = document.getElementsByClassName('descricao');
+            var descricao = descricaos[0];
+            if (descricao == "") {
+                alert("Necessário informar descrição da solicitação");
+                descricao.focus()
+                return false
+            }
+
+            var outputs = document.getElementsByClassName('output');
+            var output = outputs[0];
+
+            if (buttontype.classList.contains("full")) {
+                output.value = "CC" + "#" + tipopessoa.value + "#" + tipoconta.value + "#" + nomecliente.value + "#" + cpfcnpj.value + "#" + banco.value + "#" + agencia.value + "#" + conta.value + "#" + contadigito.value + "#" + motivo.value + "#" + dobro.value + "#" + descricao.value + "#" + celular.value + "#" + celular2.value + "#" + celular3.value + "#" + email.value + "#" + formatData(vencimento.value) + " -" + vencimento2.value + " -" + vencimento3.value + " -" + vencimento4.value + " -" + vencimento5.value + " -" + vencimento6.value + " #"
+            } else {
+                output.value = "OP" + "#" + tipopessoa.value + "#" + nomecliente.value + "#" + cpfcnpj.value + "#" + motivo.value + "#" + dobro.value + "#" + descricao.value + "#" + celular.value + "#" + celular2.value + "#" + celular3.value + "#" + email.value + "#" + vencimento.value + " -" + vencimento2.value + " -" + vencimento3.value + " -" + vencimento4.value + " -" + vencimento5.value + " -" + vencimento6.value + " #"
+            }
+        }
+
+        function copiarTexto() {
+            var outputs = document.getElementsByClassName('output');
+            var output = outputs[0];
+            if (output.value.length > 0) {
+                var textoCopiado = output.value;
+                navigator.clipboard.writeText(textoCopiado).then(() => {
+                    alert("Texto copiado!");
+                }, () => {
+                    alert("ERRO");
+                });
+            }
+        }
+
+        function formatData(input) {
+            let ano = input.substring(0, 4);
+            let mes = input.substring(0, 7).substr(5);
+            let dia = input.substring(0, 10).substr(8);
+
+            return data = dia + "/" + mes + "/" + ano;
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Open+Sans:wght@300;400;500;600&display=swap');
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #E3262E;
+        }
+
+        .image {
+            margin-top: 3rem;
+        }
+
+        .image img {
+            width: 150px;
+        }
+
+        .container {
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+            display: flex;
+            box-shadow: 5px 5px 10px #0000002f;
+        }
+
+        .form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding-bottom: 3rem;
+            border: 2px solid #00000057;
+        }
+
+        .form-header {
+            margin-top: 3rem;
+            /*margin-bottom: 3rem;*/
+            display: flex;
+            justify-content: center;
+        }
+
+        /*.form-header h1::after {
+            content: '';
+            display: block;
+            width: 37.4rem;
+            height: 0.3rem;
+            background-color: #E3262E;
+            margin: 0 auto;
+            position: absolute;
+            border-radius: 10px;
+        }*/
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .container-group {
+            justify-content: space-between;
+            padding: 0.3rem 0;
+        }
+
+        .container-box {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.1rem;
+        }
+
+        .container-box[data-name="Conta"] {
+            flex-direction: row;
+        }
+
+        .container-box[data-name="Vencimento"] {
+            flex-direction: row;
+            margin-bottom: 0rem;
+        }
+
+        .container-box[data-name="Button"] {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container-box[data-name="Conta-texto"] {
+            margin-bottom: 0rem;
+        }
+
+        .container-box input {
+            margin: 0.6rem 0rem;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 1px 1px 6px #0000002f;
+            font-size: 0.8rem;
+        }
+
+        .output {
+            margin: 0.6rem 0rem;
+            padding: 0.8rem 1.2rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            min-height: 8rem;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 1px 1px 6px #0000002f;
+            font-size: 0.8rem;
+            resize: none;
+        }
+
+        .container-box .conta {
+            max-width: 100%;
+        }
+
+        .container-box .conta-digito {
+            margin: 0.6rem;
+            max-width: 6%;
+        }
+
+        .container-box .celular {
+            margin: 0.6rem;
+            margin-left: 0rem;
+            max-width: 100%;
+        }
+
+        .container-box .vencimento {
+            margin: 0.6rem;
+            margin-left: 0rem;
+            max-width: 100%;
+        }
+
+        .container-box input:hover {
+            background-color: #eeeeee75;
+        }
+
+        .container-box input:focus-visible {
+            outline: 1px solid #E3262E;
+        }
+
+        .container-box label {
+            margin: 0 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #000000c0;
+        }
+
+        .container-box input::placeholder {
+            color: #000000be;
+        }
+
+        .container-box select {
+            height: 90%;
+            margin: 0.6rem 0;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 1px 1px 6px #0000002f;
+            font-size: 0.8rem;
+        }
+
+        .container-box select:hover {
+            background-color: #eeeeee75;
+        }
+
+        .container-box select:focus-visible {
+            outline: 1px solid #E3262E;
+        }
+
+        .container-box select::placeholder {
+            color: #000000be;
+        }
+
+        .button button {
+            max-width: 100%;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            background-color: #E3262E;
+            padding: 0.62rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button button:hover {
+            background-color: #E3262E;
+        }
+
+        .button button a {
+            text-decoration: none;
+            font-size: 0.93rem;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .footer {
+            width: 50%;
+            text-align: center;
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer p {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .navbar {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+            justify-content: center;
+            background-color: #e9e9e9;
+        }
+
+        .navitem {
+            color: #000000c0;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.7rem 4.5rem;
+            text-decoration: none;
+            font-size: 12px;
+            border: 2px solid #00000057;
+            border-top: none;
+        }
+
+        .right {
+            border-right: none;
+        }
+
+        .left {
+            border-left: none;
+        }
+
+        .active {
+            background-color: #fff;
+            border: none;
+        }
+    </style>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="apple-touch-icon" sizes="57x57"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="https://mondrian.claro.com.br/brands/nosvg/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192"
+            href="https://mondrian.claro.com.br/brands/nosvg/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32"
+            href="https://mondrian.claro.com.br/brands/nosvg/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96"
+            href="https://mondrian.claro.com.br/brands/nosvg/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16"
+            href="https://mondrian.claro.com.br/brands/nosvg/favicon-16x16.png">
+        <meta name="msapplication-TileImage" content="https://mondrian.claro.com.br/brands/nosvg/ms-icon-144x144.png">
+    </head>
+
+<body>
+    <div class="image">
+        <center><img src="https://mondrian.claro.com.br/brands/inverse/claro.svg"></center>
+    </div>
+    <div class="container">
+        <div class="form">
+            <div class="navbar">
+                <a class="navitem left active" id="navitem" href="#">Análise de Reembolso para
+                    identificação do
+                    valor devido <br> Solicitações em Conta Corrente</a>
+                <a class="navitem right" id="navitem" href="#">Análise de Reembolso para identificação
+                    do valor devido
+                    <br> Solicitações em Ordem de Pagamento <br> Solicitar somente quando assinante não possuir conta
+                    corrente em instituição financeira</a>
+            </div>
+            <form action="#">
+
+                <div class="form-header">
+                    <!--<div class="title">
+                        <h1>Lorem ipsum dolor sit amet, consectetur</h1>
+                    </div>-->
+                </div>
+
+                <div class="container-group">
+                    <div class="container-box">
+                        <label for="tipopessoa">O reembolso será para um contrato de Pessoa Física ou Jurídica:</label>
+                        <select class="tipopessoa" name="tipopessoa" OnChange="javascript:selecttipopessoa(this.value);"
+                            required>
+                            <option value="" style="display:none"></option>
+                            <option value="PESSOA_FISICA">Pessoa Física (Inserir CPF)</option>
+                            <option value="PESSOA_JURIDICA">Pessoa Juridica (Inserir CNPJ)</option>
+                        </select>
+                    </div>
+
+                    <div class="container-box grouphide">
+                        <label for="tipoconta">O reembolso será na conta do Cliente NET ou Terceiro (Já cadastrado no
+                            NETSMS)</label>
+                        <select class="tipoconta" name="tipoconta" size="1" required>
+                            <option value="" style="display:none"></option>
+                            <option value="CLIENTE">Cliente NET</option>
+                            <option value="TERCEIRO">Terceiro</option>
+                        </select>
+                    </div>
+
+                    <div class="container-box">
+                        <label for="nomecliente">Confirme o nome completo do titular da conta</label>
+                        <input class="nomecliente" id="nomecliente" type="text" style="text-transform:uppercase"
+                            required>
+                    </div>
+
+                    <div class="container-box" id="cpfcnpj">
+                    </div>
+
+                    <div class="container-box grouphide">
+                        <label for="banco">Banco em que será feito o reembolso</label>
+                        <select class="banco" name="banco" size="1" required>
+                            <option value="" style="display:none"></option>
+                            <option value="237">Bradesco</option>
+                            <option value="745">Citibank</option>
+                            <option value="229">Banco Cruzeiro do Sul</option>
+                            <option value="001">Banco do Brasil</option>
+                            <option value="341">Itaú</option>
+                            <option value="033">Santander</option>
+                            <option value="041">Banrisul</option>
+                            <option value="104">Caixa Econômica Federal</option>
+                            <option value="409">Unibanco</option>
+                            <option value="246">Banco ABC Brasil S.A. </option>
+                            <option value="025">Banco Alfa S.A. </option>
+                            <option value="641">Banco Alvorada S.A. </option>
+                            <option value="038">Banco Banestado S.A. </option>
+                            <option value="740">Banco Barclays S.A. </option>
+                            <option value="107">Banco BBM S.A. </option>
+                            <option value="031">Banco Beg S.A. </option>
+                            <option value="096">Banco BM&F de Serviços de Liquidação e Custódia S.A </option>
+                            <option value="752">Banco BNP Paribas Brasil S.A. </option>
+                            <option value="248">Banco Boavista Interatlântico S.A. </option>
+                            <option value="225">Banco Brascan S.A. </option>
+                            <option value="044">Banco BVA S.A. </option>
+                            <option value="263">Banco Cacique S.A. </option>
+                            <option value="222">Banco Calyon Brasil S.A. </option>
+                            <option value="040">Banco Cargill S.A. </option>
+                            <option value="215">Banco Comercial e de Investimento Sudameris S.A. </option>
+                            <option value="756">Banco Cooperativo do Brasil S.A. - BANCOOB </option>
+                            <option value="748">Banco Cooperativo Sicredi S.A. </option>
+                            <option value="505">Banco Credit Suisse (Brasil) S.A. </option>
+                            <option value="003">Banco da Amazônia S.A. </option>
+                            <option value="707">Banco Daycoval S.A. </option>
+                            <option value="024">Banco de Pernambuco S.A. - BANDEPE </option>
+                            <option value="456">Banco de Tokyo-Mitsubishi UFJ Brasil S.A. </option>
+                            <option value="214">Banco Dibens S.A. </option>
+                            <option value="027">Banco do Estado de Santa Catarina S.A. </option>
+                            <option value="047">Banco do Estado de Sergipe S.A. </option>
+                            <option value="037">Banco do Estado do Pará S.A. </option>
+                            <option value="004">Banco do Nordeste do Brasil S.A. </option>
+                            <option value="265">Banco Fator S.A. </option>
+                            <option value="224">Banco Fibra S.A. </option>
+                            <option value="626">Banco Ficsa S.A. </option>
+                            <option value="175">Banco Finasa S.A. </option>
+                            <option value="252">Banco Fininvest S.A. </option>
+                            <option value="233">Banco GE Capital S.A. </option>
+                            <option value="734">Banco Gerdau S.A. </option>
+                            <option value="612">Banco Guanabara S.A. </option>
+                            <option value="063">Banco Ibi S.A. Banco Múltiplo </option>
+                            <option value="604">Banco Industrial do Brasil S.A. </option>
+                            <option value="320">Banco Industrial e Comercial S.A. </option>
+                            <option value="653">Banco Indusval S.A. </option>
+                            <option value="630">Banco Intercap S.A. </option>
+                            <option value="376">Banco J. P. Morgan S.A. </option>
+                            <option value="074">Banco J. Safra S.A. </option>
+                            <option value="600">Banco Luso Brasileiro S.A. </option>
+                            <option value="389">Banco Mercantil do Brasil S.A. </option>
+                            <option value="755">Banco Merrill Lynch de Investimentos S.A. </option>
+                            <option value="045">Banco Opportunity S.A. </option>
+                            <option value="623">Banco Panamericano S.A. </option>
+                            <option value="611">Banco Paulista S.A. </option>
+                            <option value="643">Banco Pine S.A. </option>
+                            <option value="638">Banco Prosper S.A. </option>
+                            <option value="747">Banco Rabobank International Brasil S.A. </option>
+                            <option value="633">Banco Rendimento S.A. </option>
+                            <option value="072">Banco Rural Mais S.A. </option>
+                            <option value="453">Banco Rural S.A. </option>
+                            <option value="422">Banco Safra S.A. </option>
+                            <option value="250">Banco Schahin S.A. </option>
+                            <option value="749">Banco Simples S.A. </option>
+                            <option value="366">Banco Société Générale Brasil S.A. </option>
+                            <option value="637">Banco Sofisa S.A. </option>
+                            <option value="464">Banco Sumitomo Mitsui Brasileiro S.A. </option>
+                            <option value="634">Banco Triângulo S.A. </option>
+                            <option value="208">Banco UBS Pactual S.A. </option>
+                            <option value="116">Banco Único S.A. </option>
+                            <option value="655">Banco Votorantim S.A. </option>
+                            <option value="610">Banco VR S.A. </option>
+                            <option value="370">Banco WestLB do Brasil S.A. </option>
+                            <option value="021">BANESTES S.A. Banco do Estado do Espírito Santo </option>
+                            <option value="719">Banif-Banco Internacional do Funchal (Brasil)S.A. </option>
+                            <option value="204">Bankpar Banco Multiplo S.A.. </option>
+                            <option value="073">BB Banco Popular do Brasil S.A. </option>
+                            <option value="069">BPN Brasil Banco Mútiplo S.A. </option>
+                            <option value="070">BRB - Banco de Brasília S.A. </option>
+                            <option value="487">Deutsche Bank S.A. - Banco Alemão </option>
+                            <option value="751">Dresdner Bank Brasil S.A. - Banco Múltiplo </option>
+                            <option value="062">Hipercard Banco Múltiplo S.A. </option>
+                            <option value="492">ING Bank N.V. </option>
+                            <option value="488">JPMorgan Chase Bank </option>
+                            <option value="000">Ordem de Pagamento </option>
+                            <option value="230">Unicard Banco Múltiplo S.A. </option>
+                            <option value="260">NuBank</option>
+                            <option value="212">BANCO ORIGINAL S.A.</option>
+                            <option value="077">BANCO INTER</option>
+                            <option value="634">BANCO TRIANGULO S.A.</option>
+                        </select>
+                    </div>
+                    <div class="container-box grouphide">
+                        <label for="agencia">Informe a Agência de origem do débito (Sem dígitos):</label>
+                        <input class="agencia" name="agencia" id="agencia" type="number" placeholder="xxxx" value=""
+                            size="4" maxlength="4" OnBlur="preencheZeros(this.id,4), validaNumero(this, this.maxLength)"
+                            required>
+                    </div>
+                </div>
+
+                <div class="container-group" data-name="Conta">
+                    <div class="container-box grouphide" data-name="Conta-texto">
+                        <label for="conta-texto">Informe a Conta Corrente de origem do débito</label>
+                    </div>
+                    <div class="container-box grouphide" data-name="Conta">
+                        <input class="conta" name="conta" class="conta" type="number" placeholder="xxxxxxxxxxxx"
+                            value="" size="12" maxlength="12" OnBlur="validaNumero(this, this.maxLength)" required>
+                        <input class="conta-digito" name="conta-digito" type="number" placeholder="xx" value="" size="2"
+                            maxlength="2" OnBlur="validaNumero(this, this.maxLength)" required>
+                    </div>
+                </div>
+
+                <div class="container-group">
+                    <div class="container-box">
+                        <label for="motivo">Qual o motivo do reembolso</label>
+                        <select class="motivo" name="motivo" size="1" OnChange="teste(this.value)" required>
+                            <option value="" style="display:none"></option>
+                            <option value="CLIENTE PAGOU EM DUPLICIDADE">Cliente pagou em duplicidade</option>
+                            <option value="DESCONEXÃO POR OPÇÃO">Contrato cancelado gerando faturas(Desconexão Por
+                                Opção)</option>
+                            <option value="ERROS DE COBRANÇA NET">Cobrança de valores incorretos na fatura</option>
+                            <option value="REEMBOLSO POR DANOS">DANOS CAUSADOS</option>
+                            <option value="DESACORDO NA VENDA">Produto/serviço cobrado e não solicitado</option>
+                            <option value="CHAMADAS NET FONE">Cobrança de ligações não reconhecidas</option>
+                            <option value="DCC EM CONTA DE TERCEIRO">Débito em conta corrente de Terceiro(DCC indevido)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="container-box">
+                        <label for="dobrotxt">Reembolso em dobro?</label>
+                        <select class="dobro" name="dobro" size="1" required>
+                            <option value="" style="display:none"></option>
+                            <option value="REEMBOLSO EM DOBRO_SIM">Sim</option>
+                            <option value="REEMBOLSO EM DOBRO_NÃO">Não</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="container-group" data-name="Conta">
+                    <div class="container-box" data-name="Conta-texto">
+                        <label for="telefones">Solicite ao cliente números de celular para retorno da
+                            solicitação</label>
+                    </div>
+
+                    <div class="container-box" data-name="Conta">
+                        <input name="telefone1" class="celular" type="tel" placeholder="(xx) xxxxx-xxxx" value=""
+                            size="12" maxlength="15" onBlur="validaCelular(this);" required>
+                        <input name="telefone2" class="celular" type="tel" placeholder="(xx) xxxxx-xxxx" value=""
+                            size="12" maxlength="15" onBlur="validaCelular(this);">
+                        <input name="telefone3" class="celular" type="tel" placeholder="(xx) xxxxx-xxxx" value=""
+                            size="12" maxlength="15" onBlur="validaCelular(this);">
+                    </div>
+
+                    <div class="container-box" data-name="Conta-texto">
+                        <label for="vencimentos">Descrever o(s) vencimento(s) da(s) fatura(s) reclamada(s) pelo cliente
+                            para a análise do reembolso</label>
+                    </div>
+
+                    <div class="container-box" data-name="Vencimento">
+                        <input name="vencimento1" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10" required>
+                        <input name="vencimento2" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10">
+                        <input name="vencimento3" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10">
+                    </div>
+
+                    <div class="container-box" data-name="Conta">
+                        <input name="vencimento4" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10">
+                        <input name="vencimento5" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10">
+                        <input name="vencimento6" class="vencimento" type="date" placeholder="dd/mm/aaaa" value=""
+                            size="10" maxlength="10">
+                    </div>
+                </div>
+
+                <div class="container-group">
+                    <div class="container-box">
+                        <label for="email">Email do assinante</label>
+                        <input class="email" name="email" type="email" id="email"" size=" 45" maxlength="45"
+                            style="text-transform:uppercase" required>
+                    </div>
+
+                    <div class="container-box">
+                        <label for="obervacao">OBSERVAÇÃO (Max. 140 Caracteres):</label>
+                        <input class="descricao" name="email" type="text" name="email" size="53" maxlength="140"
+                            style="text-transform:uppercase" required>
+                    </div>
+                </div>
+                <div class="container-box" data-name="Button">
+                    <div class="button">
+                        <button class="validacampo full" type="button" onClick="valida_campo()"><a>Gerar</a></button>
+                        <button type="button" onClick="copiarTexto()"><a>Copiar</a></button>
+                        <button type="button"><a href="">Limpar</a></button>
+                    </div>
+
+                    <label for=" textopadrao">Texto Padrão:</label>
+                    <label for="textopadrao">ATENÇÃO: Colar o texto abaixo no NETSMS e em seguida, se entender
+                        necessário, descrever quais os possíveis problemas que causaram o reembolso.</label>
+                    <!--<input name="output" class="output" id="retornooutput" type="text" onFocus="this.blur()" value=""
+                        size="115" maxlength="260"></center>-->
+                    <textarea name="output" class="output" id="retornooutput" type="text" onFocus="this.blur()" value=""
+                        size="115" maxlength="260"></textarea>
+                </div>
+                <div class="container-box">
+                    <center><label for="importante">IMPORTANTE</label></center>
+                    <label for="importante1">Informe ao cliente que o pedido de reembolso será analisado pela área
+                        financeira, e a área entrará em contato informando o valor devido do Reembolso.</label>
+                    <label for="importante2">Para evitar divergêncas de informações, não informar possíveis valores
+                        de reembolso, pois o valor válido somente pode ser calculado pela área financeira.</label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        <p>© 2022 Claro. Todos os direitos reservados.</p>
+    </div>
+</body>
+
+</html>
